@@ -18,3 +18,5 @@ logs/
 conf/config.ini
 static/imgs/team/
 static/imgs/user/
+*.log
+*.log.*
