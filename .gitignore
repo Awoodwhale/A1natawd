@@ -4,6 +4,10 @@
 *.dll
 *.so
 *.dylib
+*.log
+*.log.*
+*.zip
+*.tar
 
 # Test binary, built with `go test -c`
 *.test
@@ -18,5 +22,3 @@ logs/
 conf/config.ini
 static/imgs/team/
 static/imgs/user/
-*.log
-*.log.*
