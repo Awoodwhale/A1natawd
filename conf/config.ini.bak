@@ -41,3 +41,11 @@ LogKeepCount = 30
 
 [page]
 PageSize = 10
+
+[flag]
+DockerServerIP = 127.0.0.1
+FlagEnv = FLAG
+FlagPrefix = flag
+MaxTeamCount = 100
+WebBoxStartPort = 20000
+PwnBoxStartPort = 30000
