@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	GinLogger  gin.HandlerFunc
-	GormLogger *gormLog.LoggerGorm
-	Logger     *logrus.Logger // 分发给coder的log
+	GinLogger    gin.HandlerFunc
+	GormLogger   *gormLog.LoggerGorm
+	Logger       *logrus.Logger // 分发给coder的log
+	DockerLogger *logrus.Logger // 专门记录docker的log
 )
 
 // InitLogger
@@ -31,7 +32,16 @@ func InitLogger(logPath string, logLevel, logKeepCount int) {
 	if err != nil {
 		panic(err)
 	}
+	opt.LogLevel = logrus.DebugLevel
+	opt.FileNamePrefix = "docker.log"
+	opt.ErrLogPrefix = "docker.err.log"
+	opt.LogPrefix = "DOCKER|"
+	dlg, err := uLog.New(opt)
+	if err != nil {
+		panic(err)
+	}
 	Logger = lg
+	DockerLogger = dlg
 	initGinLogger(logPath, logLevel, logKeepCount)
 	initGormLogger(logPath, logLevel, logKeepCount)
 }

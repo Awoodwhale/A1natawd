@@ -46,12 +46,22 @@ var (
 	LogKeepCount int // log保存时间/天
 	// page
 	PageSize uint
+	// flag
+	DockerServerIP  string
+	FlagEnv         string
+	FlagPrefix      string
+	MaxTeamCount    int
+	WebBoxStartPort int
+	PwnBoxStartPort int
 )
 
 // Init
 // @Description: 从config.ini读取配置
-func Init() {
-	file, err := ini.Load("./conf/config.ini")
+func Init(confPath string) {
+	if confPath == "" {
+		confPath = "./conf/config.ini"
+	}
+	file, err := ini.Load(confPath)
 	if err != nil {
 		panic(err)
 	}
@@ -64,6 +74,7 @@ func Init() {
 	loadI18n(file)
 	loadLog(file)
 	loadPage(file)
+	loadFlag(file)
 	// logger init
 	wlog.InitLogger(LogPath, LogLevel, LogKeepCount)
 	// mysql read（主）
@@ -151,4 +162,16 @@ func loadLog(file *ini.File) {
 // @param file *ini.File
 func loadPage(file *ini.File) {
 	PageSize, _ = file.Section("page").Key("PageSize").Uint()
+}
+
+// loadFlag
+// @Description: 配置flag
+// @param file *ini.File
+func loadFlag(file *ini.File) {
+	DockerServerIP = file.Section("flag").Key("DockerServerIP").String()
+	FlagEnv = file.Section("flag").Key("FlagEnv").String()
+	FlagPrefix = file.Section("flag").Key("FlagPrefix").String()
+	MaxTeamCount, _ = file.Section("flag").Key("MaxTeamCount").Int()
+	WebBoxStartPort, _ = file.Section("flag").Key("WebBoxStartPort").Int()
+	PwnBoxStartPort, _ = file.Section("flag").Key("PwnBoxStartPort").Int()
 }

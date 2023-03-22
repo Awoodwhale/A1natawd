@@ -1,4 +1,4 @@
-package wbox
+package wdocker
 
 import (
 	"context"
@@ -16,6 +16,7 @@ type Docker struct {
 }
 
 func NewDockerClient() *Docker {
+	// TODO: 使用 DockerServerIP 进行docker服务
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		wlog.DockerLogger.Errorln("Docker Client create error,", err.Error())
@@ -24,13 +25,20 @@ func NewDockerClient() *Docker {
 	return &Docker{cli}
 }
 
-func (d *Docker) PullImage(imageName string) error {
+func (d *Docker) CheckImageExist(imageName string) bool {
 	cli, ctx := d.Client, context.Background()
 	_, _, err := cli.ImageInspectWithRaw(ctx, imageName)
 	if err == nil {
-		// 镜像存在，无需执行操作
+		return true
+	}
+	return false
+}
+
+func (d *Docker) PullImage(imageName string) error {
+	cli, ctx := d.Client, context.Background()
+	if d.CheckImageExist(imageName) {
 		wlog.DockerLogger.Infoln("Docker image has exist, image name:", imageName)
-		return err
+		return nil
 	}
 	resp, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
 
@@ -45,7 +53,7 @@ func (d *Docker) PullImage(imageName string) error {
 	}
 
 	if err := resp.Close(); err != nil {
-		wlog.DockerLogger.Errorln("Docker pull image error,", err.Error())
+		wlog.DockerLogger.Errorln("Docker pull image resp close error,", err.Error())
 	}
 
 	return nil

@@ -18,3 +18,10 @@ var node, _ = snowflake.NewNode(1)
 func GenID() int64 {
 	return node.Generate().Int64()
 }
+
+// BasePage
+// @Description: 分页model
+type BasePage struct {
+	PageNum  uint `json:"page_num" form:"page_num"`
+	PageSize uint `json:"page_size" form:"page_size"`
+}

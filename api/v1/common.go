@@ -13,8 +13,7 @@ import (
 // @return serializer.Response
 func ErrorResponse(err error, service any, c *gin.Context) serializer.Response {
 	return serializer.Response{
-		Code:    e.Error,
-		Message: e.GetMessageByCode(e.Error, c),
-		Error:   e.HandleBindingError(err, service, c),
+		Code:    e.Invalid,
+		Message: e.HandleBindingError(err, service, c),
 	}
 }

@@ -11,6 +11,7 @@ import (
 	"go_awd/pkg/wlog"
 	"go_awd/serializer"
 	"net/http"
+	"runtime"
 	"time"
 )
 
@@ -26,16 +27,16 @@ func NewRouter() *gin.Engine {
 
 	v1 := router.Group("api/v1")                          // v1版本的api
 	v1.Use(lm.LimitMiddleware(200, 5*time.Minute, "all")) // 5分钟最对请求200次
-	v1.Use(auth.FileTypeMiddleware())                     // 过滤文件后缀
 	{
 		// ping test
 		v1.GET("ping", func(c *gin.Context) {
-			c.JSON(http.StatusOK, serializer.RespSuccess(e.Success, "ping", c))
+			c.JSON(http.StatusOK, serializer.RespSuccess(e.Success, runtime.GOOS, c))
 		})
 	}
 	// 无需权限校验的接口
 	unAuthed := v1.Group("/")
 	unAuthedUser := unAuthed.Group("user")
+	unAuthedUser.Use(auth.FileTypeMiddleware()) // 过滤文件后缀
 	{
 		// 用户注册
 		unAuthedUser.POST("register",
@@ -81,6 +82,7 @@ func NewRouter() *gin.Engine {
 	}
 	// 需要权限的team接口
 	authedTeam := authed.Group("team")
+	authedTeam.Use(auth.FileTypeMiddleware()) // 过滤文件后缀
 	{
 		authedTeam.POST("create", api.CreateTeam)                            // 创建团队
 		authedTeam.POST("apply", api.ApplyTeam)                              // 申请入队
@@ -94,6 +96,16 @@ func NewRouter() *gin.Engine {
 			auth.Role("leader"),
 			lm.LimitMiddleware(30, time.Minute, "update_user"),
 			api.UpdateTeam)
+	}
+
+	adminAuthed := authed.Group("admin")
+	adminAuthed.Use(auth.Role("admin"))
+	{
+		adminAuthed.GET("challenge", api.ShowChallenge)            // 获取题目列表
+		adminAuthed.POST("challenge", api.CreateOrUpdateChallenge) // 上传题目
+		adminAuthed.PUT("challenge/:id", api.UpdateChallengeInfo)  // 修改题目
+		adminAuthed.POST("challenge/:id", api.StartTestChallenge)  // 开启题目
+		adminAuthed.DELETE("challenge/:id")                        // 删除题目环境
 	}
 	return router
 }
