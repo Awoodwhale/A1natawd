@@ -21,6 +21,9 @@ type UpdateChallengeInfoService struct {
 	InnerServerPort string `json:"inner_server_port" form:"inner_server_port" binding:"omitempty,gte=0,lte=65535" msg:"invalid_port"`
 }
 
+type RemoveContainerService struct {
+}
+
 type EmptyService struct {
 	model.BasePage
 }

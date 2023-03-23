@@ -7,6 +7,7 @@ import (
 	"go_awd/dao"
 	"go_awd/pkg/wlog"
 	"gopkg.in/ini.v1"
+	"time"
 )
 
 var (
@@ -48,13 +49,18 @@ var (
 	// page
 	PageSize uint
 	// flag
-	DockerServerIP  string
-	FlagEnv         string
-	FlagPrefix      string
-	MaxTeamCount    int
-	SSHStartPort    int
-	WebBoxStartPort int
-	PwnBoxStartPort int
+	DockerServerIP     string
+	FlagEnv            string
+	SSHUsernameEnv     string
+	SSHPasswordEnv     string
+	SSHDefaultUsername string
+	SSHDefaultPassword string
+	FlagPrefix         string
+	ContainerExistTime time.Duration
+	MaxTeamCount       int
+	SSHStartPort       int
+	WebBoxStartPort    int
+	PwnBoxStartPort    int
 )
 
 // Init
@@ -175,7 +181,13 @@ func loadPage() {
 func loadFlag() {
 	DockerServerIP = file.Section("flag").Key("DockerServerIP").String()
 	FlagEnv = file.Section("flag").Key("FlagEnv").String()
+	SSHUsernameEnv = file.Section("flag").Key("SSHUsernameEnv").String()
+	SSHPasswordEnv = file.Section("flag").Key("SSHPasswordEnv").String()
+	SSHDefaultUsername = file.Section("flag").Key("SSHDefaultUsername").String()
+	SSHDefaultPassword = file.Section("flag").Key("SSHDefaultPassword").String()
 	FlagPrefix = file.Section("flag").Key("FlagPrefix").String()
+	sec, _ := file.Section("flag").Key("ContainerExistTime").Int64()
+	ContainerExistTime = time.Second * time.Duration(sec)
 	MaxTeamCount, _ = file.Section("flag").Key("MaxTeamCount").Int()
 	SSHStartPort, _ = file.Section("flag").Key("SSHStartPort").Int()
 	WebBoxStartPort, _ = file.Section("flag").Key("WebBoxStartPort").Int()

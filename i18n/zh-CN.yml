@@ -21,6 +21,7 @@ success_cancel_apply_team: 取消申请入队成功
 success_reject_team: 拒绝入队成功
 success_upload_challenge: 成功上传题目，正在处理镜像，请稍后查看镜像状态
 success_start_test_challenge: 开启题目测试成功
+success_find_started_test_challenge: 题目测试已经开启
 
 invalid_too_many_request: 访问过于频繁
 invalid_exist_user: 用户名或邮箱已存在
@@ -60,8 +61,9 @@ invalid_challenge_type: 题目类型只能为pwn或web
 invalid_create_challenge: 创建题目失败
 invalid_update_challenge: 更新题目失败
 invalid_not_exist_challenge: 不存在的题目
-invalid_not_success_challenge: 非success状态下的题目不能更新
+invalid_not_success_challenge: 题目未构建成功
 invalid_port: 端口无效
+invalid_container_info_lost: 容器未启动或容器信息丢失
 
 error_sql: SQL执行错误
 error_redis: Redis执行错误

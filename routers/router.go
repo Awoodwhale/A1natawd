@@ -4,6 +4,7 @@ import (
 	ginI18n "github.com/fishjar/gin-i18n"
 	"github.com/gin-gonic/gin"
 	api "go_awd/api/v1"
+	"go_awd/conf"
 	"go_awd/middleware/auth"
 	"go_awd/middleware/cors"
 	lm "go_awd/middleware/limit"
@@ -26,12 +27,14 @@ func NewRouter() *gin.Engine {
 	router.StaticFS("/static", http.Dir("./static")) // 设置fs路径
 
 	v1 := router.Group("api/v1")                          // v1版本的api
-	v1.Use(lm.LimitMiddleware(200, 5*time.Minute, "all")) // 5分钟最对请求200次
+	v1.Use(lm.LimitMiddleware(200, 5*time.Minute, "all")) // 5分钟最多请求200次
 	{
-		// ping test
-		v1.GET("ping", func(c *gin.Context) {
-			c.JSON(http.StatusOK, serializer.RespSuccess(e.Success, runtime.GOOS, c))
-		})
+		if conf.AppMode == "debug" {
+			// ping test
+			v1.GET("ping", func(c *gin.Context) {
+				c.JSON(http.StatusOK, serializer.RespSuccess(e.Success, runtime.GOOS, c))
+			})
+		}
 	}
 	// 无需权限校验的接口
 	unAuthed := v1.Group("/")
@@ -104,8 +107,10 @@ func NewRouter() *gin.Engine {
 		adminAuthed.GET("challenge", api.ShowChallenge)            // 获取题目列表
 		adminAuthed.POST("challenge", api.CreateOrUpdateChallenge) // 上传题目
 		adminAuthed.PUT("challenge/:id", api.UpdateChallengeInfo)  // 修改题目
-		adminAuthed.POST("challenge/:id", api.StartTestChallenge)  // 开启题目
-		adminAuthed.DELETE("challenge/:id")                        // 删除题目环境
+		adminAuthed.POST("challenge/:id",                          // 开启题目测试
+			lm.LimitMiddleware(1, 5*time.Second, "start_test_challenge"),
+			api.StartTestChallenge)
+		adminAuthed.DELETE("challenge/:id") // 删除题目环境
 	}
 	return router
 }

@@ -27,3 +27,19 @@ func AccessTokenKey(key string) string {
 	// 获取tokenKey所存储的accessToken
 	return fmt.Sprintf("user:token:access:%s", key)
 }
+
+// AdminStartTestChallengeKey
+// @Description: 返回管理员已经开启的题目的key，在redis中存储的是一个list，存放所有开启的题目
+// @param adminID int64
+// @return string
+func AdminStartTestChallengeKey(adminID int64) string {
+	return fmt.Sprintf("admin:%v:challenge", adminID)
+}
+
+// AdminContainerKey
+// @Description: 返回管理员开启的containerID，一个challengeID对应一个containerID
+// @param challengeID int64
+// @return string
+func AdminContainerKey(adminID, challengeID int64) string {
+	return fmt.Sprintf("admin:%v:container:%v", adminID, challengeID)
+}

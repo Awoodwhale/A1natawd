@@ -26,11 +26,12 @@ func TestDocker_BuildImage(t *testing.T) {
 }
 
 func TestDocker_CreateContainer(t *testing.T) {
-	if _, err := cli.CreateContainer("test:v1",
+	if _, err := cli.CreateContainerWithSSH("test:v1",
 		"test_flask",
-		util.GenFlagEnv(),
+		util.GenEnv(),
 		"8080",
-		"40001"); err != nil {
+		"40001",
+		"50001"); err != nil {
 		t.Error(err)
 	}
 }

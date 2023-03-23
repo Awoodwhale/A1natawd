@@ -11,7 +11,7 @@ func (s *UpdateChallengeInfoService) UpdateChallenge(c *gin.Context, id int64) s
 	chalDao := dao.NewChallengeDao(c)
 	chal, err := chalDao.GetByID(id)
 	if err != nil {
-		return serializer.RespCode(e.InvalidWIthNotExistChallenge, c)
+		return serializer.RespCode(e.InvalidWithNotExistChallenge, c)
 	}
 	if chal.State != "success" {
 		return serializer.RespCode(e.InvalidWithNotSuccessChallenge, c)
@@ -39,7 +39,7 @@ func (s *UpdateChallengeInfoService) UpdateChallenge(c *gin.Context, id int64) s
 	}
 	if flag {
 		if err := chalDao.UpdateByID(chal); err != nil {
-			return serializer.RespCode(e.InvalidWIthUpdateChallenge, c)
+			return serializer.RespCode(e.InvalidWithUpdateChallenge, c)
 		}
 	}
 

@@ -3,15 +3,18 @@ package challenge
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go_awd/cache"
 	"go_awd/conf"
 	"go_awd/dao"
 	"go_awd/model"
 	"go_awd/pkg/e"
 	"go_awd/pkg/util"
 	"go_awd/pkg/wdocker"
+	wjwt "go_awd/pkg/wjwt"
 	"go_awd/serializer"
 	"go_awd/service"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -26,7 +29,7 @@ func (s *CreateOrUpdateChallengeImageService) CreateOrUpdateChallenge(c *gin.Con
 		dockerTarPath := fmt.Sprintf("./docker/%v.tar", s.Title)
 		imageName := fmt.Sprintf("%v-%v", s.Title, time.Now().Unix())
 		if err := c.SaveUploadedFile(file, dockerTarPath); err != nil {
-			return serializer.RespCode(e.InvalidWIthUploadFile, c) // 上传文件失败
+			return serializer.RespCode(e.InvalidWithUploadFile, c) // 上传文件失败
 		}
 		if err := chalDao.CreateOrUpdateChallenge(&model.Challenge{
 			Title:           s.Title,
@@ -108,10 +111,30 @@ func (s *CreateOrUpdateChallengeImageService) CreateOrUpdateChallenge(c *gin.Con
 }
 
 func (s *EmptyService) StartTestChallenge(c *gin.Context, id int64) serializer.Response {
+	claims := c.MustGet("claims").(*wjwt.Claims)
+
+	// 如果这个题目已经当前这个管理员开启了一次了，就不能再开了，返回已开启的信息
+	if exist, err := cache.RedisClient.SIsMember(cache.AdminStartTestChallengeKey(claims.ID), id).Result(); err != nil || exist {
+		containerInfo, err := cache.RedisClient.HGetAll(cache.AdminContainerKey(claims.ID, id)).Result()
+		if err != nil {
+			return serializer.RespCode(e.InvalidWithContainerInfoLost, c) // 容器信息丢失
+		}
+		res := gin.H{}
+		for k, v := range containerInfo {
+			res[k] = v
+		}
+		env, _ := containerInfo["env"]
+		res["env"] = strings.Split(env, "\n")
+		return serializer.RespSuccess(e.SuccessWithFindStartedTestChallenge, res, c)
+	}
+
 	chalDao := dao.NewChallengeDao(c)
 	chal, err := chalDao.GetByID(id)
 	if err != nil {
-		return serializer.RespCode(e.InvalidWIthNotExistChallenge, c)
+		return serializer.RespCode(e.InvalidWithNotExistChallenge, c)
+	}
+	if chal.State != "success" {
+		return serializer.RespCode(e.InvalidWithNotSuccessChallenge, c)
 	}
 	var challengePort string
 	if chal.Type == "pwn" {
@@ -119,19 +142,67 @@ func (s *EmptyService) StartTestChallenge(c *gin.Context, id int64) serializer.R
 	} else {
 		challengePort = strconv.Itoa(util.GetWebPortNotInUse())
 	}
-	flagEnv := util.GenFlagEnv()
+	sshPort := strconv.Itoa(util.GetSSHPortNotInUse()) // 暴露出去容器的ssh端口
+	sshUname := conf.SSHDefaultUsername                // ssh的username
+	sshPwd := strconv.FormatInt(model.GenID(), 10)     // ssh的password
+	containerEnv := util.GenEnv(                       // 生成env
+		util.WithSSHUsername(sshUname),
+		util.WithSSHPassword(sshPwd),
+	)
 	go func() {
 		cli := wdocker.NewDockerClient()
-		if _, err := cli.CreateContainer( // 开容器
-			chal.ImageName, chal.Type+"-"+chal.Title, flagEnv, chal.InnerServerPort, challengePort); err != nil {
-			service.Errorln("StartTestChallenge CreateContainer error,", err.Error())
+		containerName := fmt.Sprintf("%v-%v-%v", chal.Type, chal.Title, claims.ID)
+		containerID, err := cli.CreateContainerWithSSH( // 开容器
+			chal.ImageName, containerName, containerEnv, chal.InnerServerPort, challengePort, sshPort)
+		if err != nil {
+			service.Errorln("StartTestChallenge CreateContainerWithSSH error,", err.Error())
+			return
 		}
+		// 把admin开启的这个题目ID放到redis中
+		if err := cache.RedisClient.SAdd(cache.AdminStartTestChallengeKey(claims.ID), chal.ID).Err(); err != nil {
+			service.Errorln("redis set AdminStartTestChallengeKey error,", err.Error())
+			return
+		}
+		// 容器info
+		containerInfo := map[string]any{
+			"challenge_id": chal.ID,
+			"container_id": containerID,
+			"type":         chal.Type,
+			"ip":           conf.DockerServerIP,
+			"port":         challengePort,
+			"ssh_port":     sshPort,
+			"ssh_username": sshUname,
+			"ssh_password": sshPwd,
+			"env":          strings.Join(containerEnv, "\n"),
+		}
+		// 如果开启容器成功，将当前这位管理员开启的容器info存入redis，同一道题一个管理员只能启动一个容器
+		if err := cache.RedisClient.HMSet(cache.AdminContainerKey(claims.ID, chal.ID), containerInfo).Err(); err != nil {
+			service.Errorln("redis set AdminContainerKey error,", err.Error())
+			// 出错了要删除容器，同时要去把键给删了
+			cache.RedisClient.SRem(cache.AdminStartTestChallengeKey(claims.ID), chal.ID)
+			if err := cli.RemoveContainer(containerID); err != nil {
+				service.Errorln("StartTestChallenge RemoveContainer error,", err.Error())
+				return
+			}
+		}
+		time.AfterFunc(conf.ContainerExistTime, func() { // 超时之后自动删除容器相关信息
+			service.Debugln("Auto remove container...")
+			cache.RedisClient.SRem(cache.AdminStartTestChallengeKey(claims.ID), chal.ID) // 删除管理员开启的题目记录
+			cache.RedisClient.Del(cache.AdminContainerKey(claims.ID, chal.ID))           // 删除管理员开启的容器记录
+			_ = cli.RemoveContainer(containerID)                                         // 删除container
+		})
 	}()
+
 	return serializer.RespSuccess(
 		e.SuccessWithStartTestChallenge,
 		gin.H{
-			"ip":   conf.DockerServerIP,
-			"port": challengePort,
-			"env":  flagEnv,
+			"challenge_id": chal.ID,
+			"type":         chal.Type,
+			"ip":           conf.DockerServerIP,
+			"port":         challengePort,
+			"ssh_port":     sshPort,
+			"ssh_username": sshUname,
+			"ssh_password": sshPwd,
+			"env":          containerEnv,
 		}, c)
 }

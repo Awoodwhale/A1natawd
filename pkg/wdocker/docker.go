@@ -66,7 +66,12 @@ func (d *Docker) BuildImage(path, imageName string) error {
 		wlog.DockerLogger.Errorln("Docker build image error,", err.Error())
 		return nil
 	}
-	defer dockerBuildContext.Close()
+	defer func(dockerBuildContext *os.File) {
+		err := dockerBuildContext.Close()
+		if err != nil {
+			wlog.DockerLogger.Errorln("dockerBuildContext.Close error,", err.Error())
+		}
+	}(dockerBuildContext)
 	opts := types.ImageBuildOptions{
 		Tags:           []string{imageName},
 		Memory:         10 * 1024 * 1024,  // 10MB
@@ -88,23 +93,30 @@ func (d *Docker) BuildImage(path, imageName string) error {
 	return nil
 }
 
-func (d *Docker) CreateContainer(imageName, containerName, flagEnv, innerPort, exposePort string) (string, error) {
+func (d *Docker) CreateContainerWithSSH(imageName, containerName string, containerEnv []string, innerPort, exposePort, exposeSSHPort string) (string, error) {
 	cli, ctx := d.Client, context.Background()
 	// 配置容器内部port与flag
 	containerConfig := &container.Config{
 		Image: imageName,
 		ExposedPorts: nat.PortSet{
-			nat.Port(innerPort): struct{}{},
+			nat.Port(innerPort): {},
+			nat.Port("22"):      {},
 		},
-		Env: []string{flagEnv},
+		Env: containerEnv,
 	}
 	// 配置宿主机的host config
 	hostConfig := &container.HostConfig{
 		PortBindings: nat.PortMap{
-			nat.Port(innerPort): []nat.PortBinding{
+			nat.Port(innerPort): []nat.PortBinding{ // bind challenge server port
 				{
 					HostIP:   "0.0.0.0",
 					HostPort: exposePort,
+				},
+			},
+			nat.Port("22"): []nat.PortBinding{ // bind ssh server port
+				{
+					HostIP:   "0.0.0.0",
+					HostPort: exposeSSHPort,
 				},
 			},
 		},
