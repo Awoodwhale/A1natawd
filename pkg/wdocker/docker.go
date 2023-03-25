@@ -159,3 +159,19 @@ func (d *Docker) RemoveContainer(containerID string) error {
 	wlog.DockerLogger.Infoln("Docker remove container success, id:", containerID)
 	return nil
 }
+
+func (d *Docker) RemoveImage(imageName string) error {
+	cli, ctx := d.Client, context.Background()
+	if exist := d.CheckImageExist(imageName); !exist {
+		return nil // 不存在这个镜像
+	}
+	if _, err := cli.ImageRemove(ctx, imageName, types.ImageRemoveOptions{
+		Force:         true,
+		PruneChildren: true,
+	}); err != nil {
+		wlog.DockerLogger.Errorln("Docker remove image error,", err.Error())
+		return err
+	}
+	wlog.DockerLogger.Infoln("Docker remove image success, imageName:", imageName)
+	return nil
+}

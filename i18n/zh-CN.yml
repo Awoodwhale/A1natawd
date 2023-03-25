@@ -19,9 +19,11 @@ success_apply_team: 申请入队成功，请等待队长审核
 success_accept_team: 同意入队成功
 success_cancel_apply_team: 取消申请入队成功
 success_reject_team: 拒绝入队成功
-success_upload_challenge: 成功上传题目，正在处理镜像，请稍后查看镜像状态
-success_start_test_challenge: 开启题目测试成功
-success_find_started_test_challenge: 题目测试已经开启
+success_upload_challenge: 上传题目成功，正在处理镜像，请稍后查看镜像状态
+success_start_test_challenge: 开启题目测试容器成功
+success_find_started_test_challenge: 题目测试容器已经开启
+success_end_test_challenge: 关闭题目测试容器成功
+success_remove_challenge: 删除题目成功
 
 invalid_too_many_request: 访问过于频繁
 invalid_exist_user: 用户名或邮箱已存在
@@ -64,6 +66,8 @@ invalid_not_exist_challenge: 不存在的题目
 invalid_not_success_challenge: 题目未构建成功
 invalid_port: 端口无效
 invalid_container_info_lost: 容器未启动或容器信息丢失
+invalid_not_exist_started_container: 题目不存在已开启的容器
+invalid_remove_challenge: 删除题目失败，该题目有容器未关闭
 
 error_sql: SQL执行错误
 error_redis: Redis执行错误

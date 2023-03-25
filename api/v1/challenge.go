@@ -61,3 +61,33 @@ func StartTestChallenge(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err, &service, c))
 	}
 }
+
+func EndTestChallenge(c *gin.Context) {
+	var service challenge.EmptyService
+	if err := c.ShouldBind(&service); err == nil {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, serializer.RespCode(e.Invalid, c))
+			return
+		}
+		res := service.EndTestChallenge(c, id)
+		c.JSON(http.StatusOK, res)
+	} else {
+		c.JSON(http.StatusBadRequest, ErrorResponse(err, &service, c))
+	}
+}
+
+func RemoveChallenge(c *gin.Context) {
+	var service challenge.EmptyService
+	if err := c.ShouldBind(&service); err == nil {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, serializer.RespCode(e.Invalid, c))
+			return
+		}
+		res := service.RemoveChallenge(c, id)
+		c.JSON(http.StatusOK, res)
+	} else {
+		c.JSON(http.StatusBadRequest, ErrorResponse(err, &service, c))
+	}
+}

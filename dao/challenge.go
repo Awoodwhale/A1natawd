@@ -55,3 +55,7 @@ func (dao *ChallengeDao) GetByID(id int64) (chal *model.Challenge, err error) {
 func (dao *ChallengeDao) UpdateByID(chal *model.Challenge) error {
 	return dao.DB.Where("id = ?", chal.ID).Updates(&chal).Error
 }
+
+func (dao *ChallengeDao) DeleteByID(id int64) error {
+	return dao.DB.Delete(&model.Challenge{}, "id = ?", id).Error
+}

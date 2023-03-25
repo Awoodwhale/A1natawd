@@ -107,10 +107,13 @@ func NewRouter() *gin.Engine {
 		adminAuthed.GET("challenge", api.ShowChallenge)            // 获取题目列表
 		adminAuthed.POST("challenge", api.CreateOrUpdateChallenge) // 上传题目
 		adminAuthed.PUT("challenge/:id", api.UpdateChallengeInfo)  // 修改题目
-		adminAuthed.POST("challenge/:id",                          // 开启题目测试
+		adminAuthed.DELETE("challenge/:id", api.RemoveChallenge)   // 删除题目
+		adminAuthed.POST("challenge/test/:id",                     // 开启题目测试
 			lm.LimitMiddleware(1, 5*time.Second, "start_test_challenge"),
 			api.StartTestChallenge)
-		adminAuthed.DELETE("challenge/:id") // 删除题目环境
+		adminAuthed.DELETE("challenge/test/:id", // 删除题目环境
+			lm.LimitMiddleware(1, 5*time.Second, "end_test_challenge"),
+			api.EndTestChallenge)
 	}
 	return router
 }

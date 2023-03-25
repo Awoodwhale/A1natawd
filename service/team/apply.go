@@ -28,7 +28,7 @@ func (t *ApplyService) ApplyTeam(c *gin.Context) serializer.Response {
 
 	if _, exist := utDao.ExistItemByUserID(user.ID); exist {
 		// 已经存在战队了（审核中）
-		return serializer.RespCode(e.InvalidWIthReviewTeam, c)
+		return serializer.RespCode(e.InvalidWithReviewTeam, c)
 	}
 
 	if err := utDao.CreateOrUpdateItemByUserID(&model.UserTeam{
