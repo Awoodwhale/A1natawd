@@ -1,5 +1,7 @@
 package model
 
+// Challenge
+// @Description: 题目model
 type Challenge struct {
 	Model
 

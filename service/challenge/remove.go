@@ -41,6 +41,12 @@ func (s *EmptyService) EndTestChallenge(c *gin.Context, id int64) serializer.Res
 	return serializer.RespSuccess(e.SuccessWithEndTestChallenge, nil, c)
 }
 
+// RemoveChallenge
+// @Description: 删除题目
+// @receiver s *EmptyService
+// @param c *gin.Context
+// @param id int64
+// @return serializer.Response
 func (s *EmptyService) RemoveChallenge(c *gin.Context, id int64) serializer.Response {
 	chalDao := dao.NewChallengeDao(c)
 	chal, err := chalDao.GetByID(id)

@@ -7,6 +7,12 @@ import (
 	"go_awd/serializer"
 )
 
+// UpdateChallenge
+// @Description: 更新题目描述
+// @receiver s *UpdateChallengeInfoService
+// @param c *gin.Context
+// @param id int64
+// @return serializer.Response
 func (s *UpdateChallengeInfoService) UpdateChallenge(c *gin.Context, id int64) serializer.Response {
 	chalDao := dao.NewChallengeDao(c)
 	chal, err := chalDao.GetByID(id)

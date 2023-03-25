@@ -105,6 +105,11 @@ func (u *RegisterAndUpdateService) UpdatePassword(c *gin.Context) serializer.Res
 	return serializer.RespSuccess(e.SuccessWithUpdatePwd, nil, c)
 }
 
+// Update
+// @Description: 更新用户信息
+// @receiver u *UpdateService
+// @param c *gin.Context
+// @return serializer.Response
 func (u *UpdateService) Update(c *gin.Context) serializer.Response {
 	claims := c.MustGet("claims").(*wjwt.Claims)
 	userDao := dao.NewUserDao(c)

@@ -128,6 +128,11 @@ func (t *AcceptOrRejectService) AcceptTeam(c *gin.Context) serializer.Response {
 	return serializer.RespSuccess(e.SuccessWithAcceptTeam, nil, c)
 }
 
+// RejectTeam
+// @Description: 拒绝加入团队
+// @receiver t *AcceptOrRejectService
+// @param c *gin.Context
+// @return serializer.Response
 func (t *AcceptOrRejectService) RejectTeam(c *gin.Context) serializer.Response {
 	claims := c.MustGet("claims").(*wjwt.Claims)
 	userDao := dao.NewUserDao(c)

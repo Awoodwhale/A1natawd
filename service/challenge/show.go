@@ -9,6 +9,11 @@ import (
 	"go_awd/service"
 )
 
+// ShowChallenges
+// @Description: 获取题目列表
+// @receiver s *EmptyService
+// @param c *gin.Context
+// @return serializer.Response
 func (s *EmptyService) ShowChallenges(c *gin.Context) serializer.Response {
 	if s.PageSize == 0 {
 		s.PageSize = conf.PageSize

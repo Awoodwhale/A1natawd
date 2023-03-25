@@ -22,6 +22,9 @@ func CreateOrUpdateChallenge(c *gin.Context) {
 	}
 }
 
+// ShowChallenge
+// @Description: 获取题目列表
+// @param c *gin.Context
 func ShowChallenge(c *gin.Context) {
 	var service challenge.EmptyService
 	if err := c.ShouldBind(&service); err == nil {
@@ -32,6 +35,9 @@ func ShowChallenge(c *gin.Context) {
 	}
 }
 
+// UpdateChallengeInfo
+// @Description: 更新题目描述信息
+// @param c *gin.Context
 func UpdateChallengeInfo(c *gin.Context) {
 	var service challenge.UpdateChallengeInfoService
 	if err := c.ShouldBind(&service); err == nil {
@@ -47,6 +53,9 @@ func UpdateChallengeInfo(c *gin.Context) {
 	}
 }
 
+// StartTestChallenge
+// @Description: 开启题目测试容器
+// @param c *gin.Context
 func StartTestChallenge(c *gin.Context) {
 	var service challenge.EmptyService
 	if err := c.ShouldBind(&service); err == nil {
@@ -62,6 +71,9 @@ func StartTestChallenge(c *gin.Context) {
 	}
 }
 
+// EndTestChallenge
+// @Description: 关闭题目测试容器
+// @param c *gin.Context
 func EndTestChallenge(c *gin.Context) {
 	var service challenge.EmptyService
 	if err := c.ShouldBind(&service); err == nil {
@@ -77,6 +89,9 @@ func EndTestChallenge(c *gin.Context) {
 	}
 }
 
+// RemoveChallenge
+// @Description: 删除题目
+// @param c *gin.Context
 func RemoveChallenge(c *gin.Context) {
 	var service challenge.EmptyService
 	if err := c.ShouldBind(&service); err == nil {

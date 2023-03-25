@@ -10,6 +10,11 @@ import (
 	"go_awd/service"
 )
 
+// RecoverPwd
+// @Description: 恢复密码
+// @receiver u *RecoverPwdService
+// @param c *gin.Context
+// @return serializer.Response
 func (u *RecoverPwdService) RecoverPwd(c *gin.Context) serializer.Response {
 	// 查询redis判断邮箱验证码是否相同
 	emailKey := cache.EmailCaptchaKey("recover", u.Email)

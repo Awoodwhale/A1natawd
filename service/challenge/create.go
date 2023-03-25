@@ -18,6 +18,11 @@ import (
 	"time"
 )
 
+// CreateOrUpdateChallenge
+// @Description: 创建或者更新题目，包含镜像
+// @receiver s *CreateOrUpdateChallengeImageService
+// @param c *gin.Context
+// @return serializer.Response
 func (s *CreateOrUpdateChallengeImageService) CreateOrUpdateChallenge(c *gin.Context) serializer.Response {
 	if s.BaseScore == 0 {
 		s.BaseScore = 10 // 默认10分
@@ -110,6 +115,12 @@ func (s *CreateOrUpdateChallengeImageService) CreateOrUpdateChallenge(c *gin.Con
 	return serializer.RespCode(e.InvalidWithCreateChallenge, c)
 }
 
+// StartTestChallenge
+// @Description: 开启题目测试容器
+// @receiver s *EmptyService
+// @param c *gin.Context
+// @param id int64
+// @return serializer.Response
 func (s *EmptyService) StartTestChallenge(c *gin.Context, id int64) serializer.Response {
 	claims := c.MustGet("claims").(*wjwt.Claims)
 
