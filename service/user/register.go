@@ -32,7 +32,7 @@ func (u *RegisterAndUpdateService) Register(c *gin.Context) serializer.Response 
 	userDao := dao.NewUserDao(c)
 	if _, exist := userDao.ExistOrNotByUserNameOrEmail(u.Username, u.Email); exist {
 		service.Debugln("user Register exist username or email")
-		return serializer.RespCode(e.InvalidWithUpdateUser, c)
+		return serializer.RespCode(e.InvalidWithExistUser, c)
 	}
 
 	// 不存在就添加用户

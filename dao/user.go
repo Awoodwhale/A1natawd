@@ -114,3 +114,10 @@ func (dao *UserDao) GetUserByUsernameAndEmail(username string, email string) (us
 	err = dao.DB.First(&user, "username = ? AND email = ?", username, email).Error
 	return
 }
+
+func (dao *UserDao) ListByCondition(condition map[string]any, page *model.BasePage) (users []*model.User, err error) {
+	err = dao.DB.Where(condition).
+		Offset(int((page.PageNum - 1) * page.PageSize)).
+		Limit(int(page.PageSize)).Find(&users).Error
+	return
+}

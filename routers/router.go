@@ -8,6 +8,7 @@ import (
 	"go_awd/middleware/auth"
 	"go_awd/middleware/cors"
 	lm "go_awd/middleware/limit"
+	"go_awd/model"
 	"go_awd/pkg/e"
 	"go_awd/pkg/wlog"
 	"go_awd/serializer"
@@ -78,33 +79,40 @@ func NewRouter() *gin.Engine {
 		authedUser.PUT("password", // 修改用户密码
 			lm.LimitMiddleware(30, time.Minute, "update_password"),
 			api.UpdateUserPwd)
-		authedUser.PUT("update", // 更新用户信息
+		authedUser.PUT("", // 更新用户信息
 			lm.LimitMiddleware(30, time.Minute, "update_user"),
 			api.UpdateUserInfo)
-		authedUser.GET("self", api.ShowUserInfo) // 展示当前用户信息
+		authedUser.GET("", api.ShowSelfUserInfo) // 展示当前用户信息
 	}
 	// 需要权限的team接口
 	authedTeam := authed.Group("team")
 	authedTeam.Use(auth.FileTypeMiddleware()) // 过滤文件后缀
 	{
-		authedTeam.POST("create", api.CreateTeam)                            // 创建团队
-		authedTeam.POST("apply", api.ApplyTeam)                              // 申请入队
-		authedTeam.DELETE("cancel", api.CancelApplyTeam)                     // 取消申请入队
-		authedTeam.DELETE("leave", api.LeaveTeam)                            // 离开团队
-		authedTeam.DELETE("dismiss", auth.Role("leader"), api.DismissTeam)   // 解散团队
-		authedTeam.DELETE("transfer", auth.Role("leader"), api.TransferTeam) // 转让团队队长
-		authedTeam.POST("accept", auth.Role("leader"), api.AcceptTeam)       // 同意入队申请
-		authedTeam.POST("reject", auth.Role("leader"), api.RejectTeam)       // 拒绝入队申请
-		authedTeam.PUT("update",                                             // 更新团队信息
-			auth.Role("leader"),
-			lm.LimitMiddleware(30, time.Minute, "update_user"),
-			api.UpdateTeam)
+		authedTeam.POST("create", api.CreateTeam)        // 创建团队
+		authedTeam.POST("apply", api.ApplyTeam)          // 申请入队
+		authedTeam.DELETE("cancel", api.CancelApplyTeam) // 取消申请入队
+		authedTeam.DELETE("leave", api.LeaveTeam)        // 离开团队
+		authedLeader := authedTeam.Group("/")            // 队长接口
+		authedLeader.Use(auth.Role(model.LeaderRole))
+		{
+			authedLeader.DELETE("dismiss", api.DismissTeam)   // 解散团队
+			authedLeader.DELETE("transfer", api.TransferTeam) // 转让团队队长
+			authedLeader.POST("accept", api.AcceptTeam)       // 同意入队申请
+			authedLeader.POST("reject", api.RejectTeam)       // 拒绝入队申请
+			authedLeader.PUT("update",                        // 更新团队信息
+				lm.LimitMiddleware(30, time.Minute, "update_user"),
+				api.UpdateTeam)
+		}
 	}
 
 	adminAuthed := authed.Group("admin")
-	adminAuthed.Use(auth.Role("admin"))
+	adminAuthed.Use(auth.Role(model.AdminRole))
 	{
-		adminAuthed.GET("challenge", api.ShowChallenge)            // 获取题目列表
+		adminAuthed.GET("user", api.ShowUsers)              // 获取用户列表
+		adminAuthed.GET("user/:id", api.ShowUserInfoByID)   // 获取用户信息
+		adminAuthed.PUT("user/:id", api.UpdateUserInfoByID) // 更新用户信息
+
+		adminAuthed.GET("challenge", api.ShowChallenges)           // 获取题目列表
 		adminAuthed.POST("challenge", api.CreateOrUpdateChallenge) // 上传题目
 		adminAuthed.PUT("challenge/:id", api.UpdateChallengeInfo)  // 修改题目
 		adminAuthed.DELETE("challenge/:id", api.RemoveChallenge)   // 删除题目

@@ -40,3 +40,10 @@ func BuildUser(user *model.User) *User {
 		CreateAt:     user.CreatedAt.Unix(),
 	}
 }
+
+func BuildUsers(items []*model.User) (users []*User) {
+	for _, item := range items {
+		users = append(users, BuildUser(item))
+	}
+	return
+}

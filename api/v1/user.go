@@ -3,6 +3,7 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"go_awd/pkg/e"
+	wjwt "go_awd/pkg/wjwt"
 	"go_awd/serializer"
 	"go_awd/service/user"
 	"net/http"
@@ -120,7 +121,8 @@ func RecoverUserPwd(c *gin.Context) {
 func UpdateUserInfo(c *gin.Context) {
 	var service user.UpdateService
 	if err := c.ShouldBind(&service); err == nil {
-		res := service.Update(c)
+		claims := c.MustGet("claims").(*wjwt.Claims)
+		res := service.Update(c, claims.ID)
 		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err, &service, c))
@@ -145,13 +147,44 @@ func ShowUserInfoByID(c *gin.Context) {
 	}
 }
 
-// ShowUserInfo
+// ShowSelfUserInfo
 // @Description: 展示用户信息
 // @param c *gin.Context
-func ShowUserInfo(c *gin.Context) {
+func ShowSelfUserInfo(c *gin.Context) {
 	var service user.EmptyService
 	if err := c.ShouldBind(&service); err == nil {
 		res := service.ShowSelf(c)
+		c.JSON(http.StatusOK, res)
+	} else {
+		c.JSON(http.StatusBadRequest, ErrorResponse(err, &service, c))
+	}
+}
+
+// ShowUsers
+// @Description: 管理员，获取用户列表
+// @param c *gin.Context
+func ShowUsers(c *gin.Context) {
+	var service user.EmptyService
+	if err := c.ShouldBind(&service); err == nil {
+		res := service.ShowUsers(c)
+		c.JSON(http.StatusOK, res)
+	} else {
+		c.JSON(http.StatusBadRequest, ErrorResponse(err, &service, c))
+	}
+}
+
+// UpdateUserInfoByID
+// @Description: 管理员，通过id更新用户
+// @param c *gin.Context
+func UpdateUserInfoByID(c *gin.Context) {
+	var service user.UpdateService
+	if err := c.ShouldBind(&service); err == nil {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, serializer.RespCode(e.Invalid, c))
+			return
+		}
+		res := service.Update(c, id)
 		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err, &service, c))

@@ -1,5 +1,7 @@
 package user
 
+import "go_awd/model"
+
 // RegisterAndUpdateService
 // @Description: 注册与更新的service
 type RegisterAndUpdateService struct {
@@ -52,4 +54,6 @@ type RecoverPwdService struct {
 
 // EmptyService
 // @Description: 空service，用来获取用户信息
-type EmptyService struct{}
+type EmptyService struct {
+	model.BasePage
+}

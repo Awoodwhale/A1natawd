@@ -22,10 +22,10 @@ func CreateOrUpdateChallenge(c *gin.Context) {
 	}
 }
 
-// ShowChallenge
+// ShowChallenges
 // @Description: 获取题目列表
 // @param c *gin.Context
-func ShowChallenge(c *gin.Context) {
+func ShowChallenges(c *gin.Context) {
 	var service challenge.EmptyService
 	if err := c.ShouldBind(&service); err == nil {
 		res := service.ShowChallenges(c)

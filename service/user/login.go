@@ -26,7 +26,7 @@ func (u *LoginService) Login(c *gin.Context) serializer.Response {
 	// 再去对比密码
 	userDao := dao.NewUserDao(c)
 	user, exist := userDao.ExistOrNotByUserNameOrEmail(u.Username, u.Username)
-	if !exist || !user.CheckPassword(u.Password) { // 不存在对应的用户或密码错误
+	if !exist || !user.CheckPassword(u.Password) || user.Role == model.NoneRole { // 不存在对应的用户或密码错误或者用户被ban
 		service.Debugln("user not found or pwd error")
 		return serializer.RespCode(e.InvalidWithAuth, c)
 	}

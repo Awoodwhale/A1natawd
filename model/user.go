@@ -9,6 +9,7 @@ const (
 	AdminRole    = "admin"
 	UserRole     = "user"
 	LeaderRole   = "leader"
+	NoneRole     = "none"
 )
 
 type User struct {

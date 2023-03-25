@@ -7,7 +7,6 @@ import (
 	"go_awd/dao"
 	"go_awd/model"
 	"go_awd/pkg/e"
-	wjwt "go_awd/pkg/wjwt"
 	"go_awd/serializer"
 	"go_awd/service"
 	"strconv"
@@ -110,10 +109,9 @@ func (u *RegisterAndUpdateService) UpdatePassword(c *gin.Context) serializer.Res
 // @receiver u *UpdateService
 // @param c *gin.Context
 // @return serializer.Response
-func (u *UpdateService) Update(c *gin.Context) serializer.Response {
-	claims := c.MustGet("claims").(*wjwt.Claims)
+func (u *UpdateService) Update(c *gin.Context, userID int64) serializer.Response {
 	userDao := dao.NewUserDao(c)
-	user, err := userDao.GetUserByID(claims.ID)
+	user, err := userDao.GetUserByID(userID)
 	file, err := c.FormFile("file")
 	flag := false
 	if err == nil {
@@ -133,6 +131,10 @@ func (u *UpdateService) Update(c *gin.Context) serializer.Response {
 		flag = true
 	}
 	if u.Username != "" {
+		// 不允许用户名重复
+		if _, exist := userDao.ExistOrNotByUserNameOrEmail(u.Username, ""); exist {
+			return serializer.RespCode(e.InvalidWithExistUser, c)
+		}
 		user.Username = u.Username
 		flag = true
 	}
