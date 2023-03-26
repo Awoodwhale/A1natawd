@@ -1,0 +1,28 @@
+success: success
+failed: failed
+params_invalid: invalid params
+
+success_register: 用户注册成功
+success_gen_captcha: 验证码已生成
+success_update_email: 用户修改邮箱成功
+success_update_pwd: 用户密码修改成功
+success_login: 用户登录成功
+
+invalid_exist_user: 用户名或邮箱已存在
+invalid_auth: 用户验证失败
+invalid_username: 用户名无效
+invalid_password: 密码无效
+invalid_email: 邮箱无效
+invalid_captcha: 验证码无效
+invalid_captcha_key: 验证码key无效
+invalid_too_many_request: 访问过于频繁
+invalid_type: 请求类型无效
+invalid_update_user: 用户数据更新失败
+invalid_same_email: 邮箱重复
+invalid_gen_jwt: 生成jwt失败
+invalid_sign: 个性签名长度无效
+
+error_sql: SQL执行错误
+error_redis: Redis执行错误
+error_encryption: 密码加密错误，请重试！
+error_gen_captcha: 验证码生成失败，请重试！
