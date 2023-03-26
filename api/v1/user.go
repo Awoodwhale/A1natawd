@@ -209,6 +209,9 @@ func BanUserByID(c *gin.Context) {
 	}
 }
 
+// ResetPwdByID
+// @Description: 管理员通过id重设用户密码，随机密码
+// @param c *gin.Context
 func ResetPwdByID(c *gin.Context) {
 	var service user.EmptyService
 	if err := c.ShouldBind(&service); err == nil {
