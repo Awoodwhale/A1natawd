@@ -12,3 +12,18 @@ This project is currently not completed
 - gin-i18n
 - gomail
 - logrus
+
+## Current Progress
+
+- Finish user manage
+- Finish team manage
+- Finish admin control user
+- Finish admin control challenge
+
+## TODO
+
+- Process game logic
+- Process container permissions
+- Unified Dockerfile upload specification
+- Process points calculation rules
+- ...
