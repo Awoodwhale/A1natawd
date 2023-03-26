@@ -20,7 +20,7 @@ func Role(role string) gin.HandlerFunc {
 		}
 		if role == model.AdminRole && claims.(*wjwt.Claims).Role == role { // 判断是否是管理员
 			c.Next()
-		} else if role == "leader" { // 判断是否是队长
+		} else if role == model.LeaderRole { // 判断是否是队长
 			userDao := dao.NewUserDao(c)
 			user, err := userDao.GetUserByID(claims.(*wjwt.Claims).ID)
 			if err != nil || !user.IsTeamLeader {
