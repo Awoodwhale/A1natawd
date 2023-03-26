@@ -34,6 +34,7 @@ var MessageFlags = map[int]string{
 	SuccessWithFindStartedTestChallenge: "success_find_started_test_challenge",
 	SuccessWithEndTestChallenge:         "success_end_test_challenge",
 	SuccessWithRemoveChallenge:          "success_remove_challenge",
+	SuccessWithBanUser:                  "success_ban_user",
 
 	InvalidTooManyRequest:               "invalid_too_many_request",
 	InvalidWithImgSize:                  "invalid_img_size",
@@ -69,6 +70,7 @@ var MessageFlags = map[int]string{
 	InvalidWithContainerInfoLost:        "invalid_container_info_lost",
 	InvalidWithNotExistStartedContainer: "invalid_not_exist_started_container",
 	InvalidWithRemoveChallenge:          "invalid_remove_challenge",
+	InvalidWithBanUser:                  "invalid_ban_user",
 
 	ErrorWithSQL:        "error_sql",
 	ErrorWithRedis:      "error_redis",

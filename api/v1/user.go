@@ -190,3 +190,36 @@ func UpdateUserInfoByID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err, &service, c))
 	}
 }
+
+// BanUserByID
+// @Description: 管理员，通过id去ban用户
+// @param c *gin.Context
+func BanUserByID(c *gin.Context) {
+	var service user.EmptyService
+	if err := c.ShouldBind(&service); err == nil {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, serializer.RespCode(e.Invalid, c))
+			return
+		}
+		res := service.BanUserByID(c, id)
+		c.JSON(http.StatusOK, res)
+	} else {
+		c.JSON(http.StatusBadRequest, ErrorResponse(err, &service, c))
+	}
+}
+
+func ResetPwdByID(c *gin.Context) {
+	var service user.EmptyService
+	if err := c.ShouldBind(&service); err == nil {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, serializer.RespCode(e.Invalid, c))
+			return
+		}
+		res := service.ResetPwdByID(c, id)
+		c.JSON(http.StatusOK, res)
+	} else {
+		c.JSON(http.StatusBadRequest, ErrorResponse(err, &service, c))
+	}
+}

@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
 	"go_awd/model"
 	"gorm.io/gorm"
 )
@@ -14,7 +14,7 @@ type UserDao struct {
 // @Description: 通过ctx获取userDao
 // @param ctx context.Context
 // @return *UserDao
-func NewUserDao(ctx *gin.Context) *UserDao {
+func NewUserDao(ctx context.Context) *UserDao {
 	return &UserDao{NewDBClient(ctx)}
 }
 

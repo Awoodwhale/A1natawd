@@ -1,6 +1,8 @@
 package user
 
-import "go_awd/model"
+import (
+	"go_awd/model"
+)
 
 // RegisterAndUpdateService
 // @Description: 注册与更新的service
@@ -56,4 +58,5 @@ type RecoverPwdService struct {
 // @Description: 空service，用来获取用户信息
 type EmptyService struct {
 	model.BasePage
+	Send string `json:"send" form:"send" binding:"omitempty oneof=true,false" msg:"invalid_params"` // 是否需要发送邮箱
 }

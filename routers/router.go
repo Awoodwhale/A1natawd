@@ -59,9 +59,7 @@ func NewRouter() *gin.Engine {
 			lm.LimitMiddleware(30, time.Minute, "email"),
 			api.SendEmailCaptcha)
 		// 重制密码
-		unAuthedUser.POST("recover",
-			lm.LimitMiddleware(30, time.Minute, "recover"),
-			api.RecoverUserPwd)
+		unAuthedUser.PUT("recover", api.RecoverUserPwd)
 		// 查询用户信息
 		unAuthedUser.GET(":id", api.ShowUserInfoByID)
 	}
@@ -108,9 +106,11 @@ func NewRouter() *gin.Engine {
 	adminAuthed := authed.Group("admin")
 	adminAuthed.Use(auth.Role(model.AdminRole))
 	{
-		adminAuthed.GET("user", api.ShowUsers)              // 获取用户列表
-		adminAuthed.GET("user/:id", api.ShowUserInfoByID)   // 获取用户信息
-		adminAuthed.PUT("user/:id", api.UpdateUserInfoByID) // 更新用户信息
+		adminAuthed.GET("user", api.ShowUsers)                 // 获取用户列表
+		adminAuthed.GET("user/:id", api.ShowUserInfoByID)      // 获取用户信息
+		adminAuthed.PUT("user/:id", api.UpdateUserInfoByID)    // 更新用户信息
+		adminAuthed.DELETE("user/:id", api.BanUserByID)        // ban用户
+		adminAuthed.PUT("user/password/:id", api.ResetPwdByID) // 重制用户密码
 
 		adminAuthed.GET("challenge", api.ShowChallenges)           // 获取题目列表
 		adminAuthed.POST("challenge", api.CreateOrUpdateChallenge) // 上传题目

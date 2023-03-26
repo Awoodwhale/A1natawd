@@ -28,6 +28,7 @@ const (
 	SuccessWithFindStartedTestChallenge                // 成功找到已经开启的题目测试容器
 	SuccessWithEndTestChallenge                        // 成功删除题目测试容器
 	SuccessWithRemoveChallenge                         // 成功删除题目
+	SuccessWithBanUser                                 // ban用户成功
 )
 const (
 	InvalidWithExistUser                = 40001 + iota // 用户名已存在
@@ -64,6 +65,7 @@ const (
 	InvalidWithContainerInfoLost                       // 容器信息丢失
 	InvalidWithNotExistStartedContainer                // 不存在已开启的容器
 	InvalidWithRemoveChallenge                         // 删除题目失败
+	InvalidWithBanUser                                 // ban用户失败
 )
 const (
 	ErrorWithSQL        = 50001 + iota // sql错误
